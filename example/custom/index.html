@@ -20,6 +20,7 @@
         </div>
         <div id="chart_placeholder"></div>
         <div style="text-align: center" id="legend"></div>
+        <div style="text-align: center" id="zoomEnd"></div>
         <script src="../../node_modules/d3/d3.js"></script>
         <script src="../../src/eventDrops.js"></script>
         <script>
@@ -77,10 +78,15 @@
                 .axisFormat(function(xAxis) {
                     xAxis.ticks(5);
                 })
-                .eventHover(function(el) { 
+                .eventHover(function(el) {
                     var series = el.parentNode.firstChild.innerHTML;
-                    var timestamp = d3.select(el).data()[0]
-                    document.getElementById('legend').innerHTML = 'Hovering [' + timestamp + '] in series "' + series + '"'; 
+                    var timestamp = d3.select(el).data()[0];
+                    document.getElementById('legend').innerHTML = 'Hovering [' + timestamp + '] in series "' + series + '"';
+                })
+                .eventZoom(function (scale) {
+                    var limit = scale.domain();
+                    var period = parseInt((limit[1] - limit[0]) / (60 * 60 * 1000) );
+                    document.getElementById('zoomEnd').innerHTML = 'Zoomed on a period of "' + period + ' hours"';
                 });
 
             var element = d3.select(chartPlaceholder).append('div').datum(data);
@@ -88,7 +94,7 @@
 
             var updateDelimiter = function (value) {
                 graph.hasDelimiter(!graph.hasDelimiter())(element);
-            }
+            };
 
             var addLine = function () {
                 var data = element.datum();
@@ -96,14 +102,14 @@
                 data.push(createEvent(names[i]));
                 elements = element.datum(data);
                 graph(element);
-            }
+            };
 
             var removeLine = function () {
                 var data = element.datum();
                 data.pop();
                 element = element.datum(data);
                 graph(element);
-            }
+            };
 
         </script>
     </body>
